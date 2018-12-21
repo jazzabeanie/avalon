@@ -105,6 +105,16 @@ class Session:
             i = self.characters.index('evil')
             self.characters[i] = 'morgana'
 
+        self.mordred = (input("do you want to play with Mordred?").lower() == 'y')
+        if self.mordred == True:
+            i = self.characters.index('evil')
+            self.characters[i] = 'mordred'
+
+        self.oberon = (input("do you want to play with Oberon?").lower() == 'y')
+        if self.oberon == True:
+            i = self.characters.index('evil')
+            self.characters[i] = 'oberon'
+
         logger.info(f"you will play with the following characters: {self.characters}")
         logger.info("")
 
@@ -139,9 +149,9 @@ class Session:
                 print_evil_characters()
             elif role == 'percival':
                 if self.morgana == True:
-                    logger.info(f"One of the following characters is Merlin, the other is evil.")
+                    logger.info(f"One of the following characters is Merlin, the other is the evil morgana. If you can figure out who Merlin is, try to protect his identity from the assassin.")
                 else:
-                    logger.info(f"Your special ability is that you get to know who merlin is")
+                    logger.info(f"Your special ability is that you get to know who merlin is. Try to protect his identify from the assassin.")
                 for p, r in self.roles.items():
                     if r in ('merlin', 'morgana'):
                         logger.info(f"  {p}")
@@ -150,6 +160,14 @@ class Session:
                     logger.info(f"You are evil and your special ability is that you pose as Merlin. Percival may think that you are Merlin.")
                 else:
                     logger.info(f"ERROR: morgana is not much use as a special character if Percival is not playing. I will assume that you are just an ordinary evil character")
+                input("Press enter when you understand.")
+                logger.info(f"You also get to know who else is evil:")
+                print_evil_characters()
+            elif role == 'mordred':
+                if self.merlin == True:
+                    logger.info(f"You are evil and your identity is no revealed to Merlin.")
+                else:
+                    logger.info(f"ERROR: mordred is not much use as a special character if Merlin is not playing. I will assume that you are just an ordinary evil character")
                 input("Press enter when you understand.")
                 logger.info(f"You also get to know who else is evil:")
                 print_evil_characters()
