@@ -1,6 +1,7 @@
 import logging
 import random
 import os
+import time
 
 logger = logging.getLogger('avalon')
 logger.setLevel(logging.DEBUG)
@@ -21,9 +22,21 @@ def clear_console():
 class Session:
     def __init__(self):
         logger.info("Welcome to Avalon.")
-        self.players = self._get_player_names()
+        while True:
+            if hasattr(self, 'players'):
+                if input("Would you like to play another round with the same characters? (Y/n) ").lower() == 'n':
+                    self.players = self._get_player_names()
+                    self.play_round()
+                else:
+                    self.play_round()
+            else:
+                self.players = self._get_player_names()
+                self.play_round()
+
+    def play_round(self):
         self.confirm_players()
         self.characters = self._get_characters()
+        logger.debug(f"characters: {self.characters}")
         self.confirm_special_characters()
         self.roles = self.assign_characters()
         logger.info("You are now ready to be assigned characters")
@@ -44,7 +57,7 @@ class Session:
             return ['good', 'good', 'good', 'good', 'good', 'evil', 'evil', 'evil']
         if self.number_of_players == 9:
             return ['good', 'good', 'good', 'good', 'good', 'evil', 'evil', 'evil', 'evil']
-        if self.number_of_players == 9:
+        if self.number_of_players == 10:
             return ['good', 'good', 'good', 'good', 'good', 'good', 'evil', 'evil', 'evil', 'evil']
 
     def _get_player_names(self):
@@ -131,11 +144,19 @@ class Session:
     def communicate_characters(self):
         def print_evil_characters():
             for p, r in self.roles.items():
-                if r in ('evil', 'assassin', 'morgana'):
+                if r in ('evil', 'assassin', 'morgana', 'mordred'):
                     logger.info(f"  {p}")
+            if self.oberon == True:
+                logger.info(f"Also know that there is another evil character - Oberon. But, his identity")
+                logger.info(f"is not known to you.")
 
         for player, role in self.roles.items():
             input(f"Press enter when only {player} is looking at this screen")
+            if role == 'good':
+                logger.info(f"thinking...")
+                for i in range(1,6):
+                    time.sleep(1)
+                    # logger.info(f"{i}")
             logger.info(f"{player}, your role is {role}.")
             if role == 'merlin':
                 logger.info(f"Your special ability is that you know who is evil:")
@@ -144,7 +165,7 @@ class Session:
             elif role == 'assassin':
                 logger.info(f"You are evil and you will get one chance to kill Merlin at the end of the game.")
                 logger.info(f"If you can correctly identify Merlin at this time, evil will win.")
-                input("Press enter when you understand.")
+                logger.info(f"")
                 logger.info(f"You also get to know who else is evil:")
                 print_evil_characters()
             elif role == 'percival':
@@ -160,25 +181,26 @@ class Session:
                     logger.info(f"You are evil and your special ability is that you pose as Merlin. Percival may think that you are Merlin.")
                 else:
                     logger.info(f"ERROR: morgana is not much use as a special character if Percival is not playing. I will assume that you are just an ordinary evil character")
-                input("Press enter when you understand.")
+                logger.info(f"")
                 logger.info(f"You also get to know who else is evil:")
                 print_evil_characters()
             elif role == 'mordred':
                 if self.merlin == True:
-                    logger.info(f"You are evil and your identity is no revealed to Merlin.")
+                    logger.info(f"You are evil and your identity is not revealed to Merlin.")
                 else:
                     logger.info(f"ERROR: mordred is not much use as a special character if Merlin is not playing. I will assume that you are just an ordinary evil character")
-                input("Press enter when you understand.")
+                logger.info(f"")
                 logger.info(f"You also get to know who else is evil:")
                 print_evil_characters()
+            elif role == 'oberon':
+                logger.info(f"You are evil but you do not get to see who else is evil. Other evil people do not know that you are evil.")
             elif role == 'evil':
                 logger.info(f"You get to know who else is evil:")
                 print_evil_characters()
             elif role == 'good':
-                # logger.info("Go forth in Merlin's name")
                 pass
             else:
-                raise AttriuteError(f"ERROR: There was an unexpected role. {player} was assigned {role}, but this was not one of the expected roles: merlin, percival, assassin, morgana, good, evil")
+                raise AttriuteError(f"ERROR: There was an unexpected role. {player} was assigned {role}, but this was not one of the expected roles: merlin, percival, assassin, morgana, mordred, oberon, good, evil")
             input("Press enter when you understand.")
             clear_console()
 
