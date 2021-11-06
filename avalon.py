@@ -24,7 +24,7 @@ class Session:
         logger.info("Welcome to Avalon.")
         while True:
             if hasattr(self, 'players'):
-                if input("Would you like to play another round with the same characters? (Y/n) ").lower() == 'n':
+                if input("Would you like to play another round with the same characters? (Y/n) ")[0].lower() == 'n':
                     self.players = self._get_player_names()
                     self.play_round()
                 else:
@@ -97,36 +97,42 @@ class Session:
         return len(self.players)
 
     def confirm_special_characters(self):
-        self.assassin = (input("do you want to play with the Assassin?").lower() == 'y')
+        self.assassin = (input("do you want to play with the Assassin?")[0].lower() == 'y')
         if self.assassin == True:
             i = self.characters.index('evil')
             self.characters[i] = 'assassin'
+            logger.debug(f"characters = {self.characters}")
 
-        self.merlin = (input("do you want to play with Merlin?").lower() == 'y')
+        self.merlin = (input("do you want to play with Merlin?")[0].lower() == 'y')
         if self.merlin == True:
             i = self.characters.index('good')
             self.characters[i] = 'merlin'
+            logger.debug(f"characters = {self.characters}")
 
 
-        self.percival = (input("do you want to play with Percival?").lower() == 'y')
+        self.percival = (input("do you want to play with Percival?")[0].lower() == 'y')
         if self.percival == True:
             i = self.characters.index('good')
             self.characters[i] = 'percival'
+            logger.debug(f"characters = {self.characters}")
 
-        self.morgana = (input("do you want to play with Morgana?").lower() == 'y')
+        self.morgana = (input("do you want to play with Morgana?")[0].lower() == 'y')
         if self.morgana == True:
             i = self.characters.index('evil')
             self.characters[i] = 'morgana'
+            logger.debug(f"characters = {self.characters}")
 
-        self.mordred = (input("do you want to play with Mordred?").lower() == 'y')
+        self.mordred = (input("do you want to play with Mordred?")[0].lower() == 'y')
         if self.mordred == True:
             i = self.characters.index('evil')
             self.characters[i] = 'mordred'
+            logger.debug(f"characters = {self.characters}")
 
-        self.oberon = (input("do you want to play with Oberon?").lower() == 'y')
+        self.oberon = (input("do you want to play with Oberon?")[0].lower() == 'y')
         if self.oberon == True:
             i = self.characters.index('evil')
             self.characters[i] = 'oberon'
+            logger.debug(f"characters = {self.characters}")
 
         logger.info(f"you will play with the following characters: {self.characters}")
         logger.info("")
@@ -134,7 +140,7 @@ class Session:
     def assign_characters(self):
         characters = self.characters
         random.shuffle(characters)
-        logger.debug(f"characters = {characters}")
+        logger.debug(f"characters = {self.characters}")
         roles = {}
         for player in self.players:
             roles[player] = characters.pop()
