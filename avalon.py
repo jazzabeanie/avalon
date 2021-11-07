@@ -97,45 +97,69 @@ class Session:
         return len(self.players)
 
     def confirm_special_characters(self):
-        self.assassin = (input("do you want to play with the Assassin?")[0].lower() == 'y')
-        if self.assassin == True:
-            i = self.characters.index('evil')
-            self.characters[i] = 'assassin'
-            logger.debug(f"characters = {self.characters}")
+        try:
+            self.assassin = (input("do you want to play with the Assassin?")[0].lower() == 'y')
+            if self.assassin == True:
+                i = self.characters.index('evil')
+                self.characters[i] = 'assassin'
+                logger.debug(f"characters = {self.characters}")
+            else:
+                logger.info("The Assassin will not be used")
 
-        self.merlin = (input("do you want to play with Merlin?")[0].lower() == 'y')
-        if self.merlin == True:
-            i = self.characters.index('good')
-            self.characters[i] = 'merlin'
-            logger.debug(f"characters = {self.characters}")
+            self.merlin = (input("do you want to play with Merlin?")[0].lower() == 'y')
+            if self.merlin == True:
+                i = self.characters.index('good')
+                self.characters[i] = 'merlin'
+                logger.debug(f"characters = {self.characters}")
+            else:
+                logger.info("Merlin will not be used")
 
 
-        self.percival = (input("do you want to play with Percival?")[0].lower() == 'y')
-        if self.percival == True:
-            i = self.characters.index('good')
-            self.characters[i] = 'percival'
-            logger.debug(f"characters = {self.characters}")
+            self.percival = (input("do you want to play with Percival?")[0].lower() == 'y')
+            if self.percival == True:
+                i = self.characters.index('good')
+                self.characters[i] = 'percival'
+                logger.debug(f"characters = {self.characters}")
+            else:
+                logger.info("Percival will not be used")
 
-        self.morgana = (input("do you want to play with Morgana?")[0].lower() == 'y')
-        if self.morgana == True:
-            i = self.characters.index('evil')
-            self.characters[i] = 'morgana'
-            logger.debug(f"characters = {self.characters}")
+            if 'evil' in self.characters:
+                self.morgana = (input("do you want to play with Morgana?")[0].lower() == 'y')
+                if self.morgana == True:
+                    i = self.characters.index('evil')
+                    self.characters[i] = 'morgana'
+                    logger.debug(f"characters = {self.characters}")
+                else:
+                    logger.info("Morgana will not be used")
+                    self.morgana = False
 
-        self.mordred = (input("do you want to play with Mordred?")[0].lower() == 'y')
-        if self.mordred == True:
-            i = self.characters.index('evil')
-            self.characters[i] = 'mordred'
-            logger.debug(f"characters = {self.characters}")
+            if 'evil' in self.characters:
+                self.mordred = (input("do you want to play with Mordred?")[0].lower() == 'y')
+                if self.mordred == True:
+                    i = self.characters.index('evil')
+                    self.characters[i] = 'mordred'
+                    logger.debug(f"characters = {self.characters}")
+                else:
+                    logger.info("Mordred will not be used")
+                    self.mordred = False
 
-        self.oberon = (input("do you want to play with Oberon?")[0].lower() == 'y')
-        if self.oberon == True:
-            i = self.characters.index('evil')
-            self.characters[i] = 'oberon'
-            logger.debug(f"characters = {self.characters}")
+            if 'evil' in self.characters:
+                self.oberon = (input("do you want to play with Oberon?")[0].lower() == 'y')
+                if self.oberon == True:
+                    i = self.characters.index('evil')
+                    self.characters[i] = 'oberon'
+                    logger.debug(f"characters = {self.characters}")
+                else:
+                    logger.info("Oberon will not be used")
+                    self.oberon = False
 
-        logger.info(f"you will play with the following characters: {self.characters}")
-        logger.info("")
+            logger.info(f"you will play with the following characters: {self.characters}")
+            logger.info("")
+        except IndexError:
+            logger.info("looks like you pressed enter without actually typing anything. Try again.")
+            self.characters = self._get_characters()
+            self.confirm_special_characters()
+
 
     def assign_characters(self):
         characters = self.characters
@@ -165,9 +189,10 @@ class Session:
                     # logger.info(f"{i}")
             logger.info(f"{player}, your role is {role}.")
             if role == 'merlin':
-                logger.info(f"Your special ability is that you know who is evil:")
+                logger.info(f"You are good. Your special ability is that you know who is evil:")
                 print_evil_characters()
-                logger.info(f"But be careful, the Assassin will get one chance to kill you at the end of the game.")
+                if self.assassin == True:
+                    logger.info(f"But be careful, on of these evil characters is the Assassin  and if he figures out who you are then the quest is lost.")
             elif role == 'assassin':
                 logger.info(f"You are evil and you will get one chance to kill Merlin at the end of the game.")
                 logger.info(f"If you can correctly identify Merlin at this time, evil will win.")
@@ -176,17 +201,20 @@ class Session:
                 print_evil_characters()
             elif role == 'percival':
                 if self.morgana == True:
-                    logger.info(f"One of the following characters is Merlin, the other is the evil morgana. If you can figure out who Merlin is, try to protect his identity from the assassin.")
+                    logger.info(f"One of the following characters is Merlin, the other is the evil Morgana. If you can figure out who Merlin is, try to protect his identity from the assassin.")
                 else:
-                    logger.info(f"Your special ability is that you get to know who merlin is. Try to protect his identify from the assassin.")
+                    logger.info(f"Your special ability is that you get to know who merlin is.")
+                    if self.assassin == True:
+                        logger.info(f"Try to protect his identify from the assassin.")
                 for p, r in self.roles.items():
                     if r in ('merlin', 'morgana'):
                         logger.info(f"  {p}")
             elif role == 'morgana':
                 if self.percival == True:
-                    logger.info(f"You are evil and your special ability is that you pose as Merlin. Percival may think that you are Merlin.")
+                    logger.info(f"You are evil and your special ability is that you pose as Merlin. Percival knows the identity of Morgana (you) and Merlin, but he does not know who is who.")
                 else:
-                    logger.info(f"ERROR: morgana is not much use as a special character if Percival is not playing. I will assume that you are just an ordinary evil character")
+                    logger.debug(f"ERROR: morgana is not much use as a special character if Percival is not playing. I will assume that they are just an ordinary evil character")
+                    logger.info(f"Since we are not playing with Perical, you are a normal evil character.")
                 logger.info(f"")
                 logger.info(f"You also get to know who else is evil:")
                 print_evil_characters()
@@ -194,7 +222,8 @@ class Session:
                 if self.merlin == True:
                     logger.info(f"You are evil and your identity is not revealed to Merlin.")
                 else:
-                    logger.info(f"ERROR: mordred is not much use as a special character if Merlin is not playing. I will assume that you are just an ordinary evil character")
+                    logger.debug(f"ERROR: mordred is not much use as a special character if Merlin is not playing. I will assume that they are just an ordinary evil character")
+                    logger.info(f"Since we are not playing with Merlin, you are a normal evil character.")
                 logger.info(f"")
                 logger.info(f"You also get to know who else is evil:")
                 print_evil_characters()
