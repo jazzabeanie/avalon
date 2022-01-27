@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 import sqlite3
 
 app = FastAPI()
@@ -23,6 +24,21 @@ CREATE TABLE IF NOT EXISTS player (
 connection.commit()
 connection.close()
 
+html_template = """
+<html>
+    <head>
+        <title>Avalon</title>
+    </head>
+    <body>
+{html_body}
+    </body>
+</html>
+"""
+
+body_template = """
+<p style='font-size:30px'>{body_message}</p>
+"""
+
 @app.get("/")
 async def root():
     connection = sqlite3.connect('game.db')
@@ -33,7 +49,9 @@ async def root():
     new_game_id = row[0][0]
     connection.commit()
     connection.close()
-    return {"message": f"you just created a new game. Your game id is {new_game_id}."} # FIXME: return the link to the new game.
+    message = f"you just created a new game. Your game id is {new_game_id}."
+    body = body_template.format(body_message = message)
+    return HTMLResponse(content=html_template.format(html_body = body), status_code=200) # FIXME: return the link to the new game.
 
 @app.get("/{game_id}")
 async def get_status(game_id: int):
@@ -48,7 +66,9 @@ async def get_status(game_id: int):
     num_players = len(player_names)
     connection.commit()
     connection.close()
-    return {"message": f"get status of game id = {game_id}", "game status": f"{game_status}", "number of players": f"{num_players}", "players": f"{sorted(player_names)}"}
+    message = f"game: {game_id}<br>status: {game_status}<br>number of players: {num_players}"
+    body = body_template.format(body_message = message)
+    return HTMLResponse(content=html_template.format(html_body = body), status_code=200)
 
 @app.get("/{game_id}/{player_name}")
 async def player_page(game_id: int, player_name: str):
@@ -58,12 +78,13 @@ async def player_page(game_id: int, player_name: str):
     row = cursor.fetchone()
     if row == None:
         cursor.execute(f"INSERT INTO player (game_id, player_name) VALUES ('{game_id}', '{player_name}')")
-        message = {"message": f"welcome {player_name}, you have been added to the game."}
+        message = f"welcome {player_name}, you have been added to the game."
     elif len(row) == 1:
-        message = {"message": f"welcome back {player_name}"}
+        message = f"welcome back {player_name}"
     else:
-        message = {"message": f"error, there are two players named '{player_name}' in game_id = {game_id}"}
+        message = f"error, there are two players named '{player_name}' in game_id = {game_id}"
     connection.commit()
     connection.close()
-    return message
+    body = body_template.format(body_message = message)
+    return HTMLResponse(content=html_template.format(html_body = body), status_code=200)
 
